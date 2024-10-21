@@ -75,7 +75,7 @@ void loop() {
   Serial.println(sensorValue);
 
   delay(200);
-  if(sensorValue <= 10){
+  if(sensorValue <= 1){
     Serial.println("CLOSED");
      if (saberEnable) {
       // Only turn off if it was previously enabled
