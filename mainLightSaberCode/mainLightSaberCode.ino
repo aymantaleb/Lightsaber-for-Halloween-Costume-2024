@@ -22,7 +22,7 @@ AudioControlSGTL5000     sgtl5000_1;
 //hall sensor init
 int hallSensorPin = A0;
 int sensorValue = 0;
-const byte ledString1 = 33;
+
 const byte ledString2 = 32;
 
 
@@ -34,8 +34,8 @@ bool saberEnable = false;
 void setup() {
   Serial.begin(9600);
   AudioMemory(8);
-  sgtl5000_1.enable();
-  sgtl5000_1.volume(0.1);
+  // sgtl5000_1.enable();
+  // sgtl5000_1.volume(0.05);
   SPI.setMOSI(SDCARD_MOSI_PIN);
   SPI.setSCK(SDCARD_SCK_PIN);
   if (!(SD.begin(SDCARD_CS_PIN))) {
@@ -46,7 +46,7 @@ void setup() {
     }
   }
 
-  pinMode(ledString1, OUTPUT);
+  
   pinMode(ledString2, OUTPUT);
 }
 
@@ -55,14 +55,13 @@ void playFile(const char *filename)
   Serial.print("Playing file: ");
   Serial.println(filename);
 
-  // Start playing the file.  This sketch continues to
-  // run while the file plays.
+ 
   playWav1.play(filename);
 
-  // A brief delay for the library read WAV info
+ 
   delay(25);
 
-  // Simply wait for the file to finish playing.
+ 
   while (playWav1.isPlaying()) {
   
   }
@@ -70,7 +69,7 @@ void playFile(const char *filename)
 
 
 void loop() {
-  while(!Serial);
+  // while(!Serial);
   sensorValue = analogRead(hallSensorPin);
   Serial.println(sensorValue);
 
@@ -79,7 +78,7 @@ void loop() {
     Serial.println("CLOSED");
      if (saberEnable) {
       // Only turn off if it was previously enabled
-      digitalWrite(ledString1, LOW);
+    
       digitalWrite(ledString2, LOW);
       playFile("IGNITIONREV.WAV");
       saberEnable = false; // Disable saber
@@ -87,7 +86,6 @@ void loop() {
   } else {
     if (!saberEnable) {
       // Only play the sound and turn on LEDs if saber was previously disabled
-      digitalWrite(ledString1, HIGH);
       digitalWrite(ledString2, HIGH);
       playFile("IGNITION.WAV");  // Play sound when the saber is activated
       saberEnable = true; // Enable saber
