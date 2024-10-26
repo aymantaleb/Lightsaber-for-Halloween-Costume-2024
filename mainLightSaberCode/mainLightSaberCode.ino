@@ -6,6 +6,7 @@
 #include <SPI.h>
 #include <SD.h>
 #include <SerialFlash.h>
+#include <Bounce.h>
 
 //I2S audio inits
 AudioPlaySdWav           playWav1;
@@ -23,9 +24,10 @@ AudioControlSGTL5000     sgtl5000_1;
 int hallSensorPin = A0;
 int sensorValue = 0;
 
+
 const byte ledString2 = 32;
 
-
+Bounce button0 = Bounce(0, 15); //15ms bounce time 
 
 //variable inits
 bool saberEnable = false;
@@ -46,7 +48,7 @@ void setup() {
     }
   }
 
-  
+  pinMode(0,INPUT_PULLUP);//internal pullup resistor for teensy
   pinMode(ledString2, OUTPUT);
 }
 
@@ -70,12 +72,13 @@ void playFile(const char *filename)
 
 void loop() {
   // while(!Serial);
+  button0.update();
   sensorValue = analogRead(hallSensorPin);
   Serial.println(sensorValue);
 
   delay(200);
   if(sensorValue <= 1){
-    Serial.println("CLOSED");
+    // Serial.println("CLOSED");
      if (saberEnable) {
       // Only turn off if it was previously enabled
     
@@ -85,11 +88,30 @@ void loop() {
     }
   } else {
     if (!saberEnable) {
+      // Serial.println("OPEN");
       // Only play the sound and turn on LEDs if saber was previously disabled
       digitalWrite(ledString2, HIGH);
       playFile("IGNITION.WAV");  // Play sound when the saber is activated
       saberEnable = true; // Enable saber
+      
     }
+    //when button pressed, LED flash and blaster deflect sound is played
+    if(button0.fallingEdge()){
+        Serial.println("BUTTON");
+        digitalWrite(ledString2, LOW);
+        delay(50);
+        digitalWrite(ledString2, HIGH);
+        delay(50);
+        digitalWrite(ledString2, LOW);
+        delay(50);
+        digitalWrite(ledString2, HIGH);
+        delay(50);
+        digitalWrite(ledString2, LOW);
+        delay(50);
+        digitalWrite(ledString2, HIGH);
+        playFile("LASER.WAV");
+       
+      }
   }
 
 }
